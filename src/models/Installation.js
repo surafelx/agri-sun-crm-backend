@@ -1,24 +1,57 @@
 const mongoose = require('mongoose');
 
 const installationSchema = new mongoose.Schema({
-  customer:     { type: mongoose.Schema.Types.ObjectId, ref: 'Customer', required: true },
-  projectTitle: { type: String, trim: true, default: '' },
+  customer:        { type: mongoose.Schema.Types.ObjectId, ref: 'Customer', required: true },
+  projectTitle:    { type: String, trim: true, default: '' },
+  projectCategory: { type: String, trim: true, default: '' },
+
+  // Site / end-user
+  siteName:     { type: String, trim: true, default: '' },
+  geoLocation:  { type: String, trim: true, default: '' },
+  endUserName:  { type: String, trim: true, default: '' },
+  endUserPhone: { type: String, trim: true, default: '' },
 
   wellData: {
-    diameter:    { type: Number, default: null },
-    depth:       { type: Number, default: null },
-    waterLevel:  { type: Number, default: null },
-    casingSize:  { type: String, trim: true, default: '' },
-    casingType:  { type: String, trim: true, default: '' },
+    diameter:   { type: Number, default: null },
+    depth:      { type: Number, default: null },
+    waterLevel: { type: Number, default: null },
+    casingSize: { type: String, trim: true, default: '' },
+    casingType: { type: String, trim: true, default: '' },
   },
 
+  // Pump
+  pumpData: {
+    type:         { type: String, trim: true, default: '' },
+    serialNumber: { type: String, trim: true, default: '' },
+    brand:        { type: String, trim: true, default: '' },
+    model:        { type: String, trim: true, default: '' },
+    power:        { type: String, trim: true, default: '' },
+    maxDischarge: { type: String, trim: true, default: '' },
+    maxHead:      { type: String, trim: true, default: '' },
+    controller:   { type: String, trim: true, default: '' },
+    solarPanel:   { type: String, trim: true, default: '' },
+  },
+
+  // Package items delivered
+  packageItems: {
+    pipe:             { type: String, trim: true, default: '' },
+    acCables:         { type: String, trim: true, default: '' },
+    dcCables:         { type: String, trim: true, default: '' },
+    accessories:      { type: String, trim: true, default: '' },
+    pvMountedStructure: { type: String, trim: true, default: '' },
+    fence:            { type: String, trim: true, default: '' },
+  },
+
+  // Installation team
+  installationTeam: [{ type: String, trim: true }],
+
   activitiesPerformed: {
-    casing:             { type: Boolean, default: false },
-    solarPump:          { type: Boolean, default: false },
-    testing:            { type: Boolean, default: false },
-    solarPanelStructure:{ type: Boolean, default: false },
-    sprinkler:          { type: Boolean, default: false },
-    practicalTraining:  { type: Boolean, default: false },
+    casing:              { type: Boolean, default: false },
+    solarPump:           { type: Boolean, default: false },
+    testing:             { type: Boolean, default: false },
+    solarPanelStructure: { type: Boolean, default: false },
+    sprinkler:           { type: Boolean, default: false },
+    practicalTraining:   { type: Boolean, default: false },
   },
 
   deliveredBy:      { type: String, trim: true, default: '' },
