@@ -17,6 +17,7 @@ const app = express();
 
 connectDB().catch((err) => { console.error('DB connection failed:', err); process.exit(1); });
 
+app.set('trust proxy', 1); // Render sits behind a reverse proxy
 app.use(helmet());
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
