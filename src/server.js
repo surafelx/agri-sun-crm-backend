@@ -18,8 +18,17 @@ const app = express();
 connectDB().catch((err) => { console.error('DB connection failed:', err); process.exit(1); });
 
 app.use(helmet());
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+  : null;
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
+  origin: allowedOrigins
+    ? (origin, cb) => {
+        if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+        cb(new Error(`CORS: origin ${origin} not allowed`));
+      }
+    : '*',
   credentials: true,
 }));
 app.use(express.json({ limit: '5mb' }));
