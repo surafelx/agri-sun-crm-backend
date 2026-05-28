@@ -52,11 +52,22 @@ router.post(
   [
     body('customer').isMongoId().withMessage('Valid customer ID required'),
     body('projectTitle').optional().trim(),
+    body('projectCategory').optional().trim(),
+    body('siteName').optional().trim(),
+    body('geoLocation').optional().trim(),
+    body('endUserName').optional().trim(),
+    body('endUserPhone').optional().trim(),
     body('status').optional().isIn(['Pending', 'In Progress', 'Completed', 'Cancelled']),
-    body('installationDate').optional().isISO8601().toDate(),
-    body('wellData.diameter').optional().isFloat(),
-    body('wellData.depth').optional().isFloat(),
-    body('wellData.waterLevel').optional().isFloat(),
+    body('installationDate').optional({ nullable: true }).isISO8601().toDate(),
+    body('wellData.diameter').optional({ nullable: true }).isFloat(),
+    body('wellData.depth').optional({ nullable: true }).isFloat(),
+    body('wellData.waterLevel').optional({ nullable: true }).isFloat(),
+    body('wellData.casingSize').optional().trim(),
+    body('wellData.casingType').optional().trim(),
+    body('deliveredBy').optional().trim(),
+    body('receivedBy').optional().trim(),
+    body('remarks').optional().trim(),
+    body('installationTeam').optional().isArray(),
   ],
   validate,
   async (req, res, next) => {
@@ -64,15 +75,25 @@ router.post(
       const customer = await Customer.findById(req.body.customer);
       if (!customer) return res.status(404).json({ message: 'Customer not found' });
 
-      const {
-        customer: customerId, projectTitle, wellData, activitiesPerformed,
-        deliveredBy, receivedBy, installationDate, status, remarks,
-      } = req.body;
-
       const installation = await Installation.create({
-        customer: customerId, projectTitle, wellData, activitiesPerformed,
-        deliveredBy, receivedBy, installationDate, status, remarks,
-        createdBy: req.user._id,
+        customer:        req.body.customer,
+        projectTitle:    req.body.projectTitle,
+        projectCategory: req.body.projectCategory,
+        siteName:        req.body.siteName,
+        geoLocation:     req.body.geoLocation,
+        endUserName:     req.body.endUserName,
+        endUserPhone:    req.body.endUserPhone,
+        wellData:        req.body.wellData,
+        pumpData:        req.body.pumpData,
+        packageItems:    req.body.packageItems,
+        installationTeam: req.body.installationTeam,
+        activitiesPerformed: req.body.activitiesPerformed,
+        deliveredBy:     req.body.deliveredBy,
+        receivedBy:      req.body.receivedBy,
+        installationDate: req.body.installationDate,
+        status:          req.body.status,
+        remarks:         req.body.remarks,
+        createdBy:       req.user._id,
       });
 
       const populated = await Installation.findById(installation._id)
@@ -92,19 +113,28 @@ router.put(
   [
     param('id').isMongoId(),
     body('status').optional().isIn(['Pending', 'In Progress', 'Completed', 'Cancelled']),
-    body('installationDate').optional().isISO8601().toDate(),
+    body('installationDate').optional({ nullable: true }).isISO8601().toDate(),
+    body('wellData.diameter').optional({ nullable: true }).isFloat(),
+    body('wellData.depth').optional({ nullable: true }).isFloat(),
+    body('wellData.waterLevel').optional({ nullable: true }).isFloat(),
+    body('installationTeam').optional().isArray(),
   ],
   validate,
   async (req, res, next) => {
     try {
       const allowed = [
-        'projectTitle', 'wellData', 'activitiesPerformed',
-        'deliveredBy', 'receivedBy', 'installationDate', 'status', 'remarks',
+        'projectTitle', 'projectCategory', 'siteName', 'geoLocation',
+        'endUserName', 'endUserPhone',
+        'wellData', 'pumpData', 'packageItems', 'installationTeam',
+        'activitiesPerformed', 'deliveredBy', 'receivedBy',
+        'installationDate', 'status', 'remarks',
       ];
       const updates = {};
       allowed.forEach((f) => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
 
-      const installation = await Installation.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true })
+      const installation = await Installation.findByIdAndUpdate(
+        req.params.id, updates, { new: true, runValidators: true }
+      )
         .populate('customer', 'fullName phone region zone woreda')
         .populate('createdBy', 'fullName email');
       if (!installation) return res.status(404).json({ message: 'Installation not found' });
