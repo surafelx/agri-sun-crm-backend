@@ -72,9 +72,10 @@ router.post(
   validate,
   async (req, res, next) => {
     try {
-      const { fullName, phone, region, zone, woreda, specificLocation, latitude, longitude, notes } = req.body;
+      const { fullName, phone, region, zone, woreda, specificLocation, latitude, longitude, notes, attachments } = req.body;
       const customer = await Customer.create({
         fullName, phone, region, zone, woreda, specificLocation, latitude, longitude, notes,
+        attachments: attachments || [],
         createdBy: req.user._id,
       });
       res.status(201).json({ customer });
@@ -97,7 +98,7 @@ router.put(
   validate,
   async (req, res, next) => {
     try {
-      const allowed = ['fullName', 'phone', 'region', 'zone', 'woreda', 'specificLocation', 'latitude', 'longitude', 'notes'];
+      const allowed = ['fullName', 'phone', 'region', 'zone', 'woreda', 'specificLocation', 'latitude', 'longitude', 'notes', 'attachments'];
       const updates = {};
       allowed.forEach((f) => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
 

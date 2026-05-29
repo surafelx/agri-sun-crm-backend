@@ -9,8 +9,18 @@ const customerSchema = new mongoose.Schema({
   specificLocation: { type: String, trim: true, default: '' },
   latitude:         { type: Number, default: null },
   longitude:        { type: Number, default: null },
-  notes:            { type: String, trim: true, default: '' },
-  createdBy:        { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  notes:      { type: String, trim: true, default: '' },
+
+  attachments: [{
+    name:       { type: String, trim: true, default: '' },
+    url:        { type: String, trim: true, default: '' },
+    publicId:   { type: String, trim: true, default: '' },
+    mimeType:   { type: String, trim: true, default: '' },
+    size:       { type: Number, default: 0 },
+    uploadedAt: { type: Date, default: Date.now },
+  }],
+
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, { timestamps: true });
 
 customerSchema.index({ fullName: 'text', phone: 'text', region: 'text', woreda: 'text' });

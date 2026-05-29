@@ -74,7 +74,17 @@ const installationSchema = new mongoose.Schema({
   installationDate: { type: Date, default: null },
   status:           { type: String, enum: ['Pending', 'In Progress', 'Completed', 'Cancelled'], default: 'Pending' },
   remarks:          { type: String, trim: true, default: '' },
-  createdBy:        { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+
+  attachments: [{
+    name:       { type: String, trim: true, default: '' },
+    url:        { type: String, trim: true, default: '' },
+    publicId:   { type: String, trim: true, default: '' },
+    mimeType:   { type: String, trim: true, default: '' },
+    size:       { type: Number, default: 0 },
+    uploadedAt: { type: Date, default: Date.now },
+  }],
+
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Installation', installationSchema);

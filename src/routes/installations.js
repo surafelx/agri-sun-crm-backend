@@ -97,6 +97,7 @@ router.post(
         installationDate: req.body.installationDate,
         status:          req.body.status,
         remarks:         req.body.remarks,
+        attachments:     req.body.attachments,
         createdBy:       req.user._id,
       });
 
@@ -131,7 +132,7 @@ router.put(
         'endUserName', 'endUserPhone', 'endUsers', 'equipment',
         'wellData', 'pumpData', 'packageItems', 'installationTeam',
         'activitiesPerformed', 'deliveredBy', 'receivedBy',
-        'installationDate', 'status', 'remarks',
+        'installationDate', 'status', 'remarks', 'attachments',
       ];
       const updates = {};
       allowed.forEach((f) => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
