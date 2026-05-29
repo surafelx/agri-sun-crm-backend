@@ -5,9 +5,14 @@ const installationSchema = new mongoose.Schema({
   projectTitle:    { type: String, trim: true, default: '' },
   projectCategory: { type: String, trim: true, default: '' },
 
-  // Site / end-user
-  siteName:     { type: String, trim: true, default: '' },
-  geoLocation:  { type: String, trim: true, default: '' },
+  // Site / end-users
+  siteName:    { type: String, trim: true, default: '' },
+  geoLocation: { type: String, trim: true, default: '' },
+  endUsers: [{
+    name:  { type: String, trim: true, default: '' },
+    phone: { type: String, trim: true, default: '' },
+  }],
+  // Legacy single-enduser fields kept for backward compat
   endUserName:  { type: String, trim: true, default: '' },
   endUserPhone: { type: String, trim: true, default: '' },
 
@@ -41,6 +46,16 @@ const installationSchema = new mongoose.Schema({
     pvMountedStructure: { type: String, trim: true, default: '' },
     fence:            { type: String, trim: true, default: '' },
   },
+
+  // Equipment items
+  equipment: [{
+    category:    { type: mongoose.Schema.Types.ObjectId, ref: 'EquipmentCategory', default: null },
+    subcategory: { type: mongoose.Schema.Types.ObjectId, ref: 'EquipmentSubcategory', default: null },
+    categoryName:    { type: String, trim: true, default: '' }, // denormalised for display
+    subcategoryName: { type: String, trim: true, default: '' },
+    quantity: { type: String, trim: true, default: '' },
+    specs:    { type: String, trim: true, default: '' },
+  }],
 
   // Installation team
   installationTeam: [{ type: String, trim: true }],

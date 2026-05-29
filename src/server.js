@@ -7,11 +7,12 @@ const rateLimit = require('express-rate-limit');
 const connectDB = require('../config/db');
 const errorHandler = require('./middleware/errorHandler');
 
-const authRoutes         = require('./routes/auth');
-const usersRoutes        = require('./routes/users');
-const customersRoutes    = require('./routes/customers');
+const authRoutes          = require('./routes/auth');
+const usersRoutes         = require('./routes/users');
+const customersRoutes     = require('./routes/customers');
 const installationsRoutes = require('./routes/installations');
-const dashboardRoutes    = require('./routes/dashboard');
+const dashboardRoutes     = require('./routes/dashboard');
+const equipmentRoutes     = require('./routes/equipment');
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use('/api/users',         usersRoutes);
 app.use('/api/customers',     customersRoutes);
 app.use('/api/installations', installationsRoutes);
 app.use('/api/dashboard',     dashboardRoutes);
+app.use('/api/equipment',     equipmentRoutes);
 
 app.use((req, res) => res.status(404).json({ message: 'Route not found' }));
 app.use(errorHandler);

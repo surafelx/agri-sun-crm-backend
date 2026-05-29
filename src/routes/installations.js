@@ -68,6 +68,8 @@ router.post(
     body('receivedBy').optional().trim(),
     body('remarks').optional().trim(),
     body('installationTeam').optional().isArray(),
+    body('equipment').optional().isArray(),
+    body('endUsers').optional().isArray(),
   ],
   validate,
   async (req, res, next) => {
@@ -83,6 +85,8 @@ router.post(
         geoLocation:     req.body.geoLocation,
         endUserName:     req.body.endUserName,
         endUserPhone:    req.body.endUserPhone,
+        endUsers:        req.body.endUsers,
+        equipment:       req.body.equipment,
         wellData:        req.body.wellData,
         pumpData:        req.body.pumpData,
         packageItems:    req.body.packageItems,
@@ -124,7 +128,7 @@ router.put(
     try {
       const allowed = [
         'projectTitle', 'projectCategory', 'siteName', 'geoLocation',
-        'endUserName', 'endUserPhone',
+        'endUserName', 'endUserPhone', 'endUsers', 'equipment',
         'wellData', 'pumpData', 'packageItems', 'installationTeam',
         'activitiesPerformed', 'deliveredBy', 'receivedBy',
         'installationDate', 'status', 'remarks',
