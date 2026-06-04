@@ -38,7 +38,10 @@ app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
 
-app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, max: 300 }));
+// Strict limit on auth routes only (brute-force protection)
+app.use('/api/auth', rateLimit({ windowMs: 15 * 60 * 1000, max: 30, message: { message: 'Too many login attempts, please try again later.' } }));
+// Generous limit for all other API routes (small internal team)
+app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, max: 2000 }));
 
 app.get('/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
 
