@@ -14,6 +14,7 @@ const installationsRoutes = require('./routes/installations');
 const dashboardRoutes     = require('./routes/dashboard');
 const equipmentRoutes     = require('./routes/equipment');
 const uploadRoutes        = require('./routes/upload');
+const reportsRoutes       = require('./routes/reports');
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use('/api/installations', installationsRoutes);
 app.use('/api/dashboard',     dashboardRoutes);
 app.use('/api/equipment',     equipmentRoutes);
 app.use('/api/upload',        uploadRoutes);
+app.use('/api/reports',       reportsRoutes);
 
 app.use((req, res) => res.status(404).json({ message: 'Route not found' }));
 app.use(errorHandler);
