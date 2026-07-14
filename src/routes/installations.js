@@ -8,6 +8,14 @@ const validate = require('../middleware/validate');
 const router = express.Router();
 router.use(authenticate);
 
+// Numeric well fields may arrive as '' from a partially-filled form; treat blank as null.
+const wellNumber = (path) =>
+  body(path)
+    .customSanitizer((v) => (v === '' || v === undefined ? null : v))
+    .optional({ nullable: true })
+    .isFloat()
+    .withMessage('Must be a number');
+
 // GET /api/installations
 router.get('/', async (req, res, next) => {
   try {
@@ -59,9 +67,9 @@ router.post(
     body('endUserPhone').optional().trim(),
     body('status').optional().isIn(['Pending', 'In Progress', 'Completed', 'Cancelled']),
     body('installationDate').optional({ nullable: true }).isISO8601().toDate(),
-    body('wellData.diameter').optional({ nullable: true }).isFloat(),
-    body('wellData.depth').optional({ nullable: true }).isFloat(),
-    body('wellData.waterLevel').optional({ nullable: true }).isFloat(),
+    wellNumber('wellData.diameter'),
+    wellNumber('wellData.depth'),
+    wellNumber('wellData.waterLevel'),
     body('wellData.casingSize').optional().trim(),
     body('wellData.casingType').optional().trim(),
     body('deliveredBy').optional().trim(),
@@ -119,9 +127,9 @@ router.put(
     param('id').isMongoId(),
     body('status').optional().isIn(['Pending', 'In Progress', 'Completed', 'Cancelled']),
     body('installationDate').optional({ nullable: true }).isISO8601().toDate(),
-    body('wellData.diameter').optional({ nullable: true }).isFloat(),
-    body('wellData.depth').optional({ nullable: true }).isFloat(),
-    body('wellData.waterLevel').optional({ nullable: true }).isFloat(),
+    wellNumber('wellData.diameter'),
+    wellNumber('wellData.depth'),
+    wellNumber('wellData.waterLevel'),
     body('installationTeam').optional().isArray(),
   ],
   validate,
@@ -137,8 +145,21 @@ router.put(
       const updates = {};
       allowed.forEach((f) => { if (req.body[f] !== undefined) updates[f] = req.body[f]; });
 
+      // Use $set with explicit wellData paths so nested subdocument fields are properly saved
+      if (req.body.wellData) {
+        const wd = req.body.wellData;
+        const setObj = {};
+        if (wd.diameter !== undefined)   setObj['wellData.diameter']   = wd.diameter;
+        if (wd.depth !== undefined)      setObj['wellData.depth']      = wd.depth;
+        if (wd.waterLevel !== undefined) setObj['wellData.waterLevel'] = wd.waterLevel;
+        if (wd.casingSize !== undefined) setObj['wellData.casingSize'] = wd.casingSize;
+        if (wd.casingType !== undefined) setObj['wellData.casingType'] = wd.casingType;
+        delete updates.wellData;
+        Object.assign(updates, setObj);
+      }
+
       const installation = await Installation.findByIdAndUpdate(
-        req.params.id, updates, { new: true, runValidators: true }
+        req.params.id, { $set: updates }, { new: true, runValidators: true }
       )
         .populate('customer', 'fullName phone region zone woreda')
         .populate('createdBy', 'fullName email');
